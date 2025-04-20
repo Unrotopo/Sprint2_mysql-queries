@@ -57,7 +57,7 @@ JOIN persona p ON am.id_alumno = p.id
 WHERE ce.anyo_inicio = 2018 AND ce.anyo_fin = 2019;
 
 -- Clausulas LEFT JOIN y RIGHT JOIN
--- 1
+-- 1 left
 SELECT 
 	d.nombre AS nombre_departamento,
     p.apellido1 AS primer_apellido,
@@ -67,4 +67,41 @@ FROM profesor pr LEFT JOIN departamento d
 ON pr.id_departamento = d.id
 JOIN persona p ON p.id = pr.id_profesor
 ORDER BY d.nombre, p.apellido1, p.apellido2, p.nombre;
+-- 1 right
+SELECT 
+	d.nombre AS nombre_departamento,
+    p.apellido1 AS primer_apellido,
+    p.apellido2 AS segundo_apellido,
+    p.nombre AS nombre_profesor
+FROM departamento d RIGHT JOIN profesor pr
+ON pr.id_departamento = d.id
+JOIN persona p ON p.id = pr.id_profesor
+ORDER BY d.nombre, p.apellido1, p.apellido2, p.nombre;
 -- 2
+SELECT 
+	p.nombre AS nombre_profe
+FROM profesor pr LEFT JOIN departamento d -- ¿hace falta hacer left Y right?
+ON pr.id_departamento = d.id
+JOIN persona p ON p.id = pr.id_profesor
+WHERE d.nombre IS NULL;
+-- 3
+SELECT
+	d.nombre AS departamento
+FROM departamento d LEFT JOIN profesor pr
+ON d.id = pr.id_departamento
+JOIN persona p ON pr.id_profesor = p.id
+WHERE p.nombre IS NULL;
+-- 4
+SELECT
+	p.nombre AS profe
+FROM profesor pr LEFT JOIN asignatura a
+ON pr.id_profesor = a.id_profesor
+JOIN persona p ON pr.id_profesor = p.id
+WHERE a.id_profesor IS NULL;
+-- 5
+SELECT
+	a.nombre AS asignatura
+FROM asignatura a LEFT JOIN profesor pr
+ON a.id_profesor = pr.id_profesor
+WHERE pr.id_profesor IS NULL;
+-- 6
