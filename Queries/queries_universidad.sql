@@ -109,3 +109,89 @@ LEFT JOIN alumno_se_matricula_asignatura am ON a.id = am.id_asignatura
 LEFT JOIN curso_escolar c ON c.id = am.id_curso_escolar
 GROUP BY d.nombre
 HAVING COUNT(am.id_asignatura) = 0;
+
+-- Consultas resumen
+-- 1
+SELECT COUNT(*) AS total_alumnos FROM persona
+WHERE tipo = "alumno";
+-- 2
+SELECT COUNT(*) AS alumnos_nacidos_1999 FROM persona
+WHERE tipo = "alumno" AND YEAR(fecha_nacimiento) = 1999;
+-- 3
+SELECT 
+	d.nombre AS departamento,
+    COUNT(d.nombre) AS numero_profesores
+FROM departamento d JOIN profesor pr
+ON d.id = pr.id_departamento
+GROUP BY d.nombre
+ORDER BY numero_profesores DESC;
+-- 4
+SELECT 
+	d.nombre AS departamento,
+    COUNT(pr.id_profesor) AS numero_profesores
+FROM departamento d LEFT JOIN profesor pr
+ON d.id = pr.id_departamento
+GROUP BY d.nombre
+ORDER BY numero_profesores DESC;
+-- 5
+SELECT
+	g.nombre AS grado,
+    COUNT(a.nombre) AS numero_asignaturas
+FROM grado g LEFT JOIN asignatura a
+ON g.id = a.id_grado
+GROUP BY g.nombre
+ORDER BY numero_asignaturas DESC;
+-- 6
+SELECT
+	g.nombre AS grado,
+    COUNT(a.nombre) AS numero_asignaturas
+FROM grado g LEFT JOIN asignatura a
+ON g.id = a.id_grado
+GROUP BY g.nombre
+HAVING numero_asignaturas > 40
+ORDER BY numero_asignaturas DESC;
+-- 7
+SELECT
+	g.nombre AS grado,
+    a.tipo AS tipo_asignatura,
+    SUM(a.creditos) AS total_creditos
+FROM grado g JOIN asignatura a
+ON g.id = a.id_grado
+GROUP BY g.nombre, tipo_asignatura;
+-- 8
+SELECT
+	c.anyo_inicio AS curso_escolar,
+	SUM(am.id_alumno) AS alumnos_matriculados
+FROM curso_escolar c JOIN alumno_se_matricula_asignatura am
+ON c.id = am.id_curso_escolar
+GROUP BY curso_escolar;
+-- 9
+SELECT
+	p.id AS id_profesor,
+    p.nombre AS nombre_profesor,
+    p.apellido1 AS primer_apellido,
+    p.apellido2 AS segundo_apellido,
+    SUM(a.id_profesor) AS numero_asignaturas
+FROM persona p JOIN profesor pr
+ON p.id = pr.id_profesor
+LEFT JOIN asignatura a
+ON a.id_profesor = pr.id_profesor
+GROUP BY p.id
+ORDER BY numero_asignaturas DESC;
+-- 10
+SELECT * FROM persona
+WHERE fecha_nacimiento = (
+	SELECT MAX(fecha_nacimiento)
+    FROM persona
+    WHERE tipo = "alumno" -- aunque no creo que la persona más joven sea un profesor...
+	);
+-- 11
+SELECT
+	p.nombre AS nombre_profe,
+    d.nombre AS departamento
+FROM profesor pr JOIN departamento d
+ON pr.id_departamento = d.id
+JOIN persona p ON p.id = pr.id_profesor
+LEFT JOIN asignatura a ON a.id_profesor = p.id
+GROUP BY p.nombre, d.nombre
+HAVING count(a.id_profesor) = 0;
