@@ -78,30 +78,34 @@ ON pr.id_departamento = d.id
 JOIN persona p ON p.id = pr.id_profesor
 ORDER BY d.nombre, p.apellido1, p.apellido2, p.nombre;
 -- 2
-SELECT 
-	p.nombre AS nombre_profe
+SELECT p.nombre AS nombre_profe
 FROM profesor pr LEFT JOIN departamento d -- ¿hace falta hacer left Y right?
 ON pr.id_departamento = d.id
 JOIN persona p ON p.id = pr.id_profesor
 WHERE d.nombre IS NULL;
 -- 3
-SELECT
-	d.nombre AS departamento
+SELECT d.nombre AS departamento
 FROM departamento d LEFT JOIN profesor pr
 ON d.id = pr.id_departamento
 JOIN persona p ON pr.id_profesor = p.id
 WHERE p.nombre IS NULL;
 -- 4
-SELECT
-	p.nombre AS profe
+SELECT p.nombre AS profe
 FROM profesor pr LEFT JOIN asignatura a
 ON pr.id_profesor = a.id_profesor
 JOIN persona p ON pr.id_profesor = p.id
 WHERE a.id_profesor IS NULL;
 -- 5
-SELECT
-	a.nombre AS asignatura
+SELECT a.nombre AS asignatura
 FROM asignatura a LEFT JOIN profesor pr
 ON a.id_profesor = pr.id_profesor
 WHERE pr.id_profesor IS NULL;
 -- 6
+SELECT d.nombre AS departamento
+FROM departamento d LEFT JOIN profesor pr
+ON pr.id_departamento = d.id
+LEFT JOIN asignatura a ON a.id_profesor = pr.id_profesor
+LEFT JOIN alumno_se_matricula_asignatura am ON a.id = am.id_asignatura
+LEFT JOIN curso_escolar c ON c.id = am.id_curso_escolar
+GROUP BY d.nombre
+HAVING COUNT(am.id_asignatura) = 0;
